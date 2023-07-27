@@ -12,8 +12,8 @@ from hashlib import md5
 
 def fanyi(query):
     # Set your own appid/appkey.
-    appid = '20230113001529382'
-    appkey = 'rrPyB9WaqmJu0YABnDZX'
+    appid = ''
+    appkey = ''
 
     # For list of language codes, please refer to `https://api.fanyi.baidu.com/doc/21`
     from_lang = 'en'
