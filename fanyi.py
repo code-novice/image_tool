@@ -7,7 +7,6 @@
 
 import requests
 import random
-import json
 from hashlib import md5
 
 def fanyi(query):
@@ -40,9 +39,15 @@ def fanyi(query):
 
     # Show response
     #print(result)
-
+    query = query.split('\n')
+    retInfo = ''
+    i = 0
     for item in result['trans_result']:
-        print(item['dst'])
+        retInfo =  retInfo + query[i] + '\n' + item['dst'] + '\n'
+        i = i + 1
+
+    #print(retInfo)
+    return retInfo
 
 if __name__ == '__main__':
     query = 'hello world \n form-urlencoded'

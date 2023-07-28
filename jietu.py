@@ -3,13 +3,22 @@
 import sys, time, logging
 from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QPen, QPainter, QColor, QGuiApplication
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog
+from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
+from easygui_xianshi import *
 from ocr import ocr
-import numpy as np
+from fanyi import fanyi
+import keyboard
+from threading import Thread, current_thread
+import os
+import easygui as gui
+
+
+ocrInfo = None
 
 class Screenshot(QWidget):
     """截图"""
 
+    # 初始化变量
     # 初始化变量
     fullScreenImage = None
     captureImage = None
@@ -19,7 +28,6 @@ class Screenshot(QWidget):
 
     # 创建 QPainter 对象
     painter = QPainter()
-
     def __init__(self):
         super().__init__()
         self.initWindow()             # 初始化窗口
@@ -119,7 +127,7 @@ class Screenshot(QWidget):
         else:
             self.fullScreenImage.save(fileName)
 
-        ocr()
+        #ocr()
 
     def keyPressEvent(self, event):
         """按键事件"""
@@ -132,22 +140,70 @@ class Screenshot(QWidget):
                 self.saveImage()
                 self.close()
 
+def get_buttonInfo(info):
+    global ocrInfo
+    if info == '继续':
+        if configInfo[0] == '1':
+            ScreenshotFunction()
+            ret = '截图已完成'
+        if configInfo[1] == '1':
+            ret = ocr()
+        if configInfo[2] == '1':
+            ret = fanyi(ret)
+        ocrInfo = get_text(ret)
+    elif info == '配置信息':
+        config()
+    elif info == '关闭' or info == None:
+        os._exit(0)
 
 
-'''
+
 def ScreenshotFunction():
-
-    
     app = QApplication(sys.argv)    # 创建 QApplication 对象
-    print('app = QApplication(sys.argv) ')
     windows = Screenshot()          # 创建 Screenshot 对象
-    print('windows = Screenshot() ')
+    windows.setWindowFlag(Qt.WindowStaysOnTopHint, True) #设置 "AlwaysOnTop" 标志
     windows.show()                  # 显示窗口
-    print('windows.show() ')
-    sys.exit(app.exec_())           # 进入主事件循环并等待直到 exit() 被调用
-    print('sys.exit(app.exec_())')
-'''
+    app.exec_()          # 进入主事件循环并等待直到 exit() 被调用
 
+def OcrRun():
+    global ocrInfo
+    while True:
+        if ocrInfo != '快捷':
+            time.sleep(0.5)
+            get_buttonInfo(ocrInfo)
+            print('主循环')
+        else:
+            time.sleep(0.5)
+            print('快捷按键', ocrInfo)
+
+def on_key_pressed(event):
+    global ocrInfo
+    print('开始监听')
+    if event.event_type == 'down' and event.name == 's' and keyboard.is_pressed('ctrl'):
+        print('按键成功')
+        gui.ObjectClose()
+        while True:
+            if ocrInfo == '快捷':
+                ocrInfo = '继续'
+                break
+
+def key_envt():
+    keyboard.on_press(on_key_pressed)
+
+    print('监听结束')
+
+
+thread01 = Thread(target=key_envt)
+thread01.setDaemon(True)
+thread01.start()
+
+ocrInfo = get_text('')
+OcrRun()
+
+
+
+
+'''
 if __name__ == '__main__':
     # 调试日志
     # logger = logging.getLogger()
@@ -156,9 +212,13 @@ if __name__ == '__main__':
     # formatter = logging.Formatter('%(message)s')
     # sh.setFormatter(formatter)
     # logger.addHandler(sh)
-    app = QApplication(sys.argv)    # 创建 QApplication 对象
-    windows = Screenshot()          # 创建 Screenshot 对象
-    windows.show()                  # 显示窗口
-    sys.exit(app.exec_())           # 进入主事件循环并等待直到 exit() 被调用
 
+    thread01 = Thread(target=key_envt)
+    thread01.start()
+    ocrInfo = get_text('')
+    while True:
+        if ocrInfo != ' ':
+            print('正常循环中 ！！！', ocrInfo)
+            get_buttonInfo(ocrInfo)
 
+'''

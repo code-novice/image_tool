@@ -2,10 +2,13 @@
 import requests
 import base64
 from fanyi import *
+#from easygui_xianshi import get_text
 
 def ocr():
     # client_id 为官网获取的AK， client_secret 为官网获取的SK
+
     host = 'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=&client_secret='
+
     response = requests.get(host)
     token = response.json()['access_token']
 
@@ -26,9 +29,11 @@ def ocr():
     if response:
         query = ''
         for words in response.json()['words_result']:
-            query = query + '\n' + words['words']
-
-    fanyi(query)
+            query = query + '\n' + words['words'] 
+    #print(query)
+    #get_text(query)
+    #fanyi(query)
+    return query
 
 if __name__ == '__main__':
     ocr()
