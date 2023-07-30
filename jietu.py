@@ -142,6 +142,7 @@ class Screenshot(QWidget):
 
 def get_buttonInfo(info):
     global ocrInfo
+    info = ocrInfo
     if info == '继续':
         if configInfo[0] == '1':
             ScreenshotFunction()
@@ -149,14 +150,14 @@ def get_buttonInfo(info):
         if configInfo[1] == '1':
             ret = ocr()
         if configInfo[2] == '1':
-            ret = fanyi(ret)
-        ocrInfo = get_text(ret)
+            ret = fanyi(ret, configInfo[3], configInfo[4])
     elif info == '配置信息':
-        config()
+        ret = config()
+        print(ret)
     elif info == '关闭' or info == None:
         os._exit(0)
 
-
+    ocrInfo = get_text(ret)
 
 def ScreenshotFunction():
     app = QApplication(sys.argv)    # 创建 QApplication 对象
@@ -171,16 +172,16 @@ def OcrRun():
         if ocrInfo != '快捷':
             time.sleep(0.5)
             get_buttonInfo(ocrInfo)
-            print('主循环')
+            #print('主循环')
         else:
             time.sleep(0.5)
-            print('快捷按键', ocrInfo)
+            #print('快捷按键', ocrInfo)
 
 def on_key_pressed(event):
     global ocrInfo
-    print('开始监听')
+    #print('开始监听')
     if event.event_type == 'down' and event.name == 's' and keyboard.is_pressed('ctrl'):
-        print('按键成功')
+        #print('按键成功')
         gui.ObjectClose()
         while True:
             if ocrInfo == '快捷':
@@ -189,15 +190,15 @@ def on_key_pressed(event):
 
 def key_envt():
     keyboard.on_press(on_key_pressed)
-
-    print('监听结束')
+    keyboard.wait('esc')
+    #print('监听结束')
 
 
 thread01 = Thread(target=key_envt)
 thread01.setDaemon(True)
 thread01.start()
-
-ocrInfo = get_text('')
+text = '配置已完成: ' + configInfo[0] + configInfo[1] + configInfo[2] + '\n翻译配置:' + configInfo[3] + '---->' + configInfo[4]
+ocrInfo = get_text(text)
 OcrRun()
 
 

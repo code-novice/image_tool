@@ -9,19 +9,17 @@ import requests
 import random
 from hashlib import md5
 
-def fanyi(query):
+def fanyi(query, from_lang, to_lang):
     # Set your own appid/appkey.
     appid = ''
     appkey = ''
 
     # For list of language codes, please refer to `https://api.fanyi.baidu.com/doc/21`
-    from_lang = 'en'
-    to_lang = 'zh'
 
     endpoint = 'http://api.fanyi.baidu.com'
     path = '/api/trans/vip/translate'
     url = endpoint + path
-
+    print(from_lang, to_lang)
     # Generate salt and sign
     def make_md5(s, encoding='utf-8'):
         return md5(s.encode(encoding)).hexdigest()
@@ -39,13 +37,13 @@ def fanyi(query):
 
     # Show response
     #print(result)
-    query = query.split('\n')
     retInfo = ''
     i = 0
+    print(result)
     for item in result['trans_result']:
-        retInfo =  retInfo + query[i] + '\n' + item['dst'] + '\n'
+        retInfo =  retInfo + item['src'] + '\n' + item['dst'] + '\n'
         i = i + 1
-
+        print(retInfo)
     #print(retInfo)
     return retInfo
 
